@@ -12,6 +12,8 @@
 #include "io_reserva.h"
 #include "temporizador_drv.h"
 #include "power.h"
+#include "alarmas.h"
+#include "gpio_hal.h"
 
 void planificador(void);
 

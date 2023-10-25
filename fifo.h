@@ -17,17 +17,8 @@
 de datos y el conjunto de posibles eventos identificados con nombre humano.
 Reservemos el ID VOID con valor cero para inicializar la cola				**/
 
-enum EVENTO_T {
-	ID_VOID = 0,
-	Timer0 = 1,
-	Timer1 = 2,
-};
 
-struct Evento {
-	enum EVENTO_T Evento_ID;
-	uint32_t auxData;
-};
-
+uint8_t esta_vacia(void);
 void FIFO_inicializar(GPIO_HAL_PIN_T pin_overflow);
 void FIFO_encolar(enum EVENTO_T ID_evento, uint32_t auxData);
 uint8_t FIFO_extraer(enum EVENTO_T *ID_evento, uint32_t* auxData);

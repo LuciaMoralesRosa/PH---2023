@@ -12,3 +12,4 @@
 .\planificador.o: temporizador_drv.h
 .\planificador.o: temporizador_hal.h
 .\planificador.o: power.h
+.\planificador.o: alarmas.h

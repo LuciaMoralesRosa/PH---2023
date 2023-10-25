@@ -22,6 +22,6 @@ void hello_world_tick_tack(void){
 	uint32_t valor;	
 	valor = gpio_hal_leer(G_Hello_World, G_Hello_World_Bits);
 	valor++;
-	gpio_hal_sentido(G_Hello_World, G_Hello_World_Bits, GPIO_HAL_PIN_DIR_INPUT);
+	gpio_hal_sentido(G_Hello_World, G_Hello_World_Bits, GPIO_HAL_PIN_DIR_INPUT); //Sobrara -> poner en gpio inicializar
 	gpio_hal_escribir(G_Hello_World, G_Hello_World_Bits, valor);
 }

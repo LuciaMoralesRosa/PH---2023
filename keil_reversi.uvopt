@@ -163,7 +163,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2\COD_Prueba_6_FuncionaTimer1\fifo.c</Filename>
+          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2 - b\COD_Prueba_1\fifo.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\keil_reversi\fifo.c\39</Expression>
         </Bp>
@@ -179,7 +179,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2\COD_Prueba_6_FuncionaTimer1\temporizador_drv.c</Filename>
+          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2 - b\COD_Prueba_1\temporizador_drv.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\keil_reversi\temporizador_drv.c\13</Expression>
         </Bp>
@@ -195,7 +195,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2\COD_Prueba_6_FuncionaTimer1\planificador.c</Filename>
+          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2 - b\COD_Prueba_1\planificador.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\keil_reversi\planificador.c\12</Expression>
         </Bp>
@@ -211,7 +211,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2\COD_Prueba_6_FuncionaTimer1\hello_world.c</Filename>
+          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2 - b\COD_Prueba_1\hello_world.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\keil_reversi\hello_world.c\16</Expression>
         </Bp>
@@ -227,14 +227,14 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2\COD_Prueba_6_FuncionaTimer1\hello_world.c</Filename>
+          <Filename>C:\1_LUCIA\a.ING. INFORMATICA\5ÂºCuatri\PH\Practicas\Practica2 - b\COD_Prueba_1\hello_world.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\keil_reversi\hello_world.c\21</Expression>
         </Bp>
         <Bp>
           <Number>5</Number>
           <Type>0</Type>
-          <LineNumber>11</LineNumber>
+          <LineNumber>9</LineNumber>
           <EnabledFlag>0</EnabledFlag>
           <Address>0</Address>
           <ByteObject>0</ByteObject>
@@ -244,6 +244,22 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>.\main.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>6</Number>
+          <Type>0</Type>
+          <LineNumber>23</LineNumber>
+          <EnabledFlag>0</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>.\planificador.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -577,6 +593,30 @@
       <bDave2>0</bDave2>
       <PathWithFileName>.\power.h</PathWithFileName>
       <FilenameWithoutPath>power.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>21</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\alarmas.c</PathWithFileName>
+      <FilenameWithoutPath>alarmas.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>3</GroupNumber>
+      <FileNumber>22</FileNumber>
+      <FileType>5</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>.\alarmas.h</PathWithFileName>
+      <FilenameWithoutPath>alarmas.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

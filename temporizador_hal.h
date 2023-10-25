@@ -10,7 +10,7 @@
 #include <LPC210x.H>
 #include <stdint.h>
 
-static unsigned int timer0_hal_ticks2us = 100000;
+static unsigned int timer0_hal_ticks2us = 10000;
 
 // Programa un contador para que pueda ser utilizado.
 void timer0_hal_iniciar(void);

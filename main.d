@@ -13,3 +13,4 @@
 .\main.o: planificador.h
 .\main.o: hello_world.h
 .\main.o: power.h
+.\main.o: alarmas.h

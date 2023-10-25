@@ -19,12 +19,12 @@ void timer0_drv_empezar(void) {
 }
 
 // Lee el tiempo que lleva contando el contador desde que se ejecutó
-// temporizador_hal_empezar() y lo devuelve en ticks
+// temporizador_hal_empezar() y lo devuelve en milisegundos
 uint64_t timer0_drv_leer(void) {
 	return timer0_hal_leer()/timer0_hal_ticks2us;
 }
 
-// Detiene el contador y devuelve el tiempo en ticks transcurrido desde
+// Detiene el contador y devuelve el tiempo en milisegundos transcurrido desde
 // el último temporizador_hal_empezar()
 uint64_t timer0_drv_parar(void){
 		return timer0_hal_parar();

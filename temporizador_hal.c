@@ -12,7 +12,7 @@ void (*ptr)();
 
 /* Timer Counter 0 Interrupt executes each 10ms @ 60 MHz CPU Clock */
 void timer0_ISR (void) __irq {
-    timer0_int_count = timer0_int_count + 100000;
+    timer0_int_count = timer0_int_count + 15000;
     T0IR = 1;                              // Clear interrupt flag
     VICVectAddr = 0;                            // Acknowledge Interrupt
 }
