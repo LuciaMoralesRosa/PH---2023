@@ -1,0 +1,15 @@
+.\main.o: main.c
+.\main.o: C:\Keil_v5\ARM\INC\Philips\LPC210x.H
+.\main.o: Power_management.h
+.\main.o: gpio_hal.h
+.\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
+.\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+.\main.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+.\main.o: temporizador_drv.h
+.\main.o: temporizador_hal.h
+.\main.o: fifo.h
+.\main.o: io_reserva.h
+.\main.o: planificador.h
+.\main.o: hello_world.h
+.\main.o: power.h
