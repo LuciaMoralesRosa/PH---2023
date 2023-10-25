@@ -1,7 +1,7 @@
 /*
  * Autor: Morales Rosa, Lucia (816906) y Pavón Calcerrada, Claudia (852698)
  * Practica 2 - Proyecto Hardware
- * 				timer0_hal.c
+ * 				temporizador_hal.c
  */
 #include "temporizador_hal.h"
 
@@ -12,7 +12,7 @@ void (*ptr)();
 
 /* Timer Counter 0 Interrupt executes each 10ms @ 60 MHz CPU Clock */
 void timer0_ISR (void) __irq {
-    timer0_int_count = timer0_int_count + 15000;
+    timer0_int_count = timer0_int_count + 100000;
     T0IR = 1;                              // Clear interrupt flag
     VICVectAddr = 0;                            // Acknowledge Interrupt
 }

@@ -13,4 +13,6 @@
 .\main.o: planificador.h
 .\main.o: hello_world.h
 .\main.o: power.h
-.\main.o: alarmas.h
+.\main.o: int_externas_hal.h
+.\main.o: botones.h
+.\main.o: int_externas_hal.h

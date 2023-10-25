@@ -1,7 +1,7 @@
 /*
  * Autor: Morales Rosa, Lucia (816906) y Pavón Calcerrada, Claudia (852698)
  * Practica 2 - Proyecto Hardware
- * 				timer0_hal.h
+ * 				temporizador_hal.h
  */
 
 #ifndef TIMER0_HAL_H
@@ -10,7 +10,7 @@
 #include <LPC210x.H>
 #include <stdint.h>
 
-static unsigned int timer0_hal_ticks2us = 10000;
+static unsigned int timer0_hal_ticks2us = 15000;
 
 // Programa un contador para que pueda ser utilizado.
 void timer0_hal_iniciar(void);

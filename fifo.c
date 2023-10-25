@@ -5,14 +5,11 @@
 */
 #include "fifo.h"
 
-#define NUM_EVENTOS 4
-
 static struct Evento cola[SIZE];
 int ini = -1;
 int fin = -1;
 
-
-static uint32_t estadisticas[NUM_EVENTOS];
+static uint32_t estadisticas[3];
 
 GPIO_HAL_PIN_T led_overflow;
 
@@ -27,14 +24,12 @@ uint8_t esta_llena() {
 }
 
 void FIFO_inicializar(GPIO_HAL_PIN_T pin_overflow) {
-	unsigned int i;
 	led_overflow = pin_overflow;
 	ini = -1;
 	fin = -1;
-	
-	for(i = 0; i < NUM_EVENTOS; i++){
-		estadisticas[i] = 0;
-	}
+	estadisticas[0] = 0;
+	estadisticas[1] = 0;
+	estadisticas[2] = 0;
 }
 
 void FIFO_encolar(enum EVENTO_T ID_evento, uint32_t auxData) {

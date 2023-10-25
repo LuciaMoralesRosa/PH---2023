@@ -1,7 +1,7 @@
 /*
  * Autor: Morales Rosa, Lucia (816906) y Pavón Calcerrada, Claudia (852698)
  * Practica 2 - Proyecto Hardware
- * 				timer0_drv.h
+ * 				temporizador_drv.h
  */
 
 #ifndef TIMER0_DRV_H

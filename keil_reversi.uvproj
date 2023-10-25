@@ -532,14 +532,24 @@
               <FilePath>.\power.h</FilePath>
             </File>
             <File>
-              <FileName>alarmas.c</FileName>
+              <FileName>int_externas_hal.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\alarmas.c</FilePath>
+              <FilePath>.\int_externas_hal.c</FilePath>
             </File>
             <File>
-              <FileName>alarmas.h</FileName>
+              <FileName>int_externas_hal.h</FileName>
               <FileType>5</FileType>
-              <FilePath>.\alarmas.h</FilePath>
+              <FilePath>.\int_externas_hal.h</FilePath>
+            </File>
+            <File>
+              <FileName>botones.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\botones.c</FilePath>
+            </File>
+            <File>
+              <FileName>botones.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\botones.h</FilePath>
             </File>
           </Files>
         </Group>

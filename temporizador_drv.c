@@ -1,7 +1,7 @@
 /*
  * Autor: Morales Rosa, Lucia (816906) y Pavón Calcerrada, Claudia (852698)
  * Practica 2 - Proyecto Hardware
- * 				timer0_drv.c
+ * 				temporizador_drv.c
  */
 #include "temporizador_drv.h"
 
@@ -19,12 +19,12 @@ void timer0_drv_empezar(void) {
 }
 
 // Lee el tiempo que lleva contando el contador desde que se ejecutó
-// temporizador_hal_empezar() y lo devuelve en milisegundos
+// temporizador_hal_empezar() y lo devuelve en ticks
 uint64_t timer0_drv_leer(void) {
 	return timer0_hal_leer()/timer0_hal_ticks2us;
 }
 
-// Detiene el contador y devuelve el tiempo en milisegundos transcurrido desde
+// Detiene el contador y devuelve el tiempo en ticks transcurrido desde
 // el último temporizador_hal_empezar()
 uint64_t timer0_drv_parar(void){
 		return timer0_hal_parar();

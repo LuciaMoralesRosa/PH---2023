@@ -7,7 +7,7 @@
 
 // Permite emplear el GPIO y debe ser invocada antes de poder llamar al resto de funciones de la biblioteca
 void gpio_hal_iniciar(void) {
-	//Los pinsel y sentido para todas las partes de gpio que se usen
+	
 }
 
 // Marcar los bits indicados como entrada o salida según la dirección.
