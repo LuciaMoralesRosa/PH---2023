@@ -1,0 +1,510 @@
+/**
+ * Autor: Morales Rosa, Lucia (816906) y Pavón Calcerrada, Claudia (852698)
+ * Practica 2 - Proyecto Hardware
+ * 				juego.c
+*/
+
+#include "juego.h"
+
+// Función para encolar eventos
+static void (*funcion_encolar)();
+
+// Variables para manejo de errores en comandos GPIO
+unsigned int gpio_comando_error;
+unsigned int gpio_comando_error_bits;
+
+//Otras ariables a usar en el modulo
+TABLERO tablero_actual;
+enum ESTADO estado = START;
+static enum EVENTO_T evento;
+static uint32_t aux;
+uint8_t sePuedeCancelar = 0;
+uint8_t jugadorActual;
+uint64_t momento_inicio_partida;
+uint64_t momento_fin_partida;
+int jugada_anterior[2];
+
+//Descomentar siguiente linea para salida en memoria
+//static uint8_t salida[8][8];
+
+//Variables para el menu de final de partida
+static char causa[200];
+static uint64_t t_hay_linea_total;
+static uint64_t t_hay_linea_media;
+static uint64_t t_pensar_jugada_total;
+static uint64_t t_pensar_jugada_media;
+static uint64_t t_inicio_pensar_jugada;
+static uint64_t t_final_pensar_jugada;
+static uint64_t t_aux;
+static uint64_t t_aux2;
+
+
+/**
+ * @brief Funcion auxiliar para encolar eventos.
+ *
+ * @param e Enumeración que representa el tipo de evento.
+ * @param a Valor auxiliar de 32 bits asociado al evento.
+ */
+void funcion_llamar_encolar_juego(enum EVENTO_T e, uint32_t a){
+		evento = e;
+		aux = a;
+		funcion_encolar(evento, aux);
+}
+
+
+/***** Funciones manejo Pantalla *****/
+
+/**
+ * @brief Escribe una cadena en la pantalla del juego a través de la línea serie.
+ *
+ * @param cadena Cadena de caracteres que se desea escribir en la pantalla.
+ */
+void juego_escribir_en_pantalla(char cadena[]) {
+		linea_serie_drv_enviar_array(cadena);
+}
+
+/**
+ * @brief Borra la pantalla del juego.
+ *
+ * Esta función utiliza la función `linea_serie_drv_limpiar_uart0` para limpiar la pantalla del juego
+ * a través de la línea serie UART0.
+*/
+void juego_borrar_pantalla() {
+		linea_serie_drv_limpiar_uart0();
+}
+
+/**
+ * @brief Convierte el estado actual del tablero a una cadena de caracteres.
+ *
+ * @param t Puntero al tablero actual.
+ * @param cadena Puntero al arreglo de caracteres donde se almacenará la representación del tablero.
+ *
+ * @note La cadena resultante incluirá la disposición de las fichas en el tablero, indicando las posiciones
+ * de las fichas blancas ('B' y 'N') y negras ('b' y 'n'), así como la numeración de las filas y columnas.
+ * Se utiliza la notación 'B' y 'N' para las fichas blancas, 'b' y 'n' para las negras, y ' ' para casillas vacías.
+ * Además, se añaden etiquetas numeradas para las filas y columnas.
+ */
+void juego_convertir_tablero_a_array(TABLERO *t, char *cadena){
+		char new_cadena[200];
+		uint8_t valor_celda = 0;
+		uint8_t iterador = 0;
+		uint8_t cols = 0;
+		char ficha;
+		for(uint8_t fils = NUM_FILAS; fils > 0; fils--){
+				new_cadena[iterador] = '0'+fils;
+				iterador++;
+				new_cadena[iterador] = '|';
+				iterador++;
+				for(cols = 0; cols < NUM_COLUMNAS; cols++){
+						valor_celda = 0;
+						valor_celda = celda_color(tablero_leer_celda(t, fils-1, cols)) * 0x11;
+						
+						if(valor_celda == 0x11){
+								if(jugada_anterior[0]==(fils-1) && jugada_anterior[1]==cols){
+										ficha = 'b';
+								}
+								else ficha = 'B';
+						}
+						else if(valor_celda == 0x22){
+								if(jugada_anterior[0]==(fils-1) && jugada_anterior[1]==cols){
+										ficha = 'n';
+								}
+								else ficha = 'N';
+						}
+						else{
+								ficha = ' ';
+						}
+						
+						new_cadena[iterador] = ficha;
+						iterador++;
+						new_cadena[iterador] = '|';
+						iterador++;
+				}
+				new_cadena[iterador] = '\n';
+				iterador++;
+		}
+		new_cadena[iterador] = '-';
+		iterador++;
+		new_cadena[iterador] = '|';
+		iterador++;
+		for(cols = 0; cols < NUM_COLUMNAS; cols++){
+				new_cadena[iterador] = cols+'1';
+				iterador++;
+				new_cadena[iterador] = '|';
+				iterador++;
+		}
+		new_cadena[iterador] = '\n';
+		iterador++;
+		new_cadena[iterador] = '\0';
+		iterador++;
+		strncpy(cadena, new_cadena, iterador);
+}
+
+/** Muestra por pantalla que jugador está jugando */
+void juego_mostrar_turno_jugador() {
+		switch (jugadorActual) {
+				case 1: juego_escribir_en_pantalla(TURNO_1); break;
+				case 2: juego_escribir_en_pantalla(TURNO_2); break;
+		}
+}
+
+/** Muestra por pantalla que jugador ha ganado */
+void juego_mostrar_ganador() {
+		switch (jugadorActual) {
+				case 1: juego_escribir_en_pantalla(GANADOR_1); break;
+				case 2: juego_escribir_en_pantalla(GANADOR_2); break;
+		}
+}
+
+/** Muestra por pantalla que jugador se ha rendido */
+void juego_mostrar_rendido() {
+		switch (jugadorActual) {
+				case 1: juego_escribir_en_pantalla(RENDIDO_1); break;
+				case 2: juego_escribir_en_pantalla(RENDIDO_2); break;
+		}
+}
+
+/** Muestra por pantalla el tablero */
+void juego_mostrar_tablero(TABLERO tablero) {
+		char cadena[200];
+		juego_borrar_pantalla();
+		juego_convertir_tablero_a_array(&tablero, cadena);
+		juego_escribir_en_pantalla(cadena);
+}
+
+/** Muestra por pantalla el final del juego */
+void juego_mostrar_instrucciones() {
+		juego_escribir_en_pantalla(INSTRUCCIONES);
+		juego_escribir_en_pantalla(INST1);
+		juego_escribir_en_pantalla(INST2);
+		juego_escribir_en_pantalla(INST3);
+		juego_escribir_en_pantalla(INST4);
+		juego_escribir_en_pantalla(INST5);
+}
+
+/** Muestra por pantalla el final del juego */
+void juego_mostrar_final() {
+	juego_escribir_en_pantalla(FINJUEGO);
+	juego_escribir_en_pantalla(PREGUNTAR_VOLVER_A_JUGAR);
+}
+
+/***** Funciones de juego *****/
+
+/** Carga el tablero en el TABLERO tab */
+void juego_cargar_tablero(TABLERO *tab, uint8_t tablero[7][7]){
+		for(uint8_t fils = 0; fils < NUM_FILAS; fils++){
+				for(uint8_t cols = 0; cols < NUM_COLUMNAS; cols++){
+						tablero_insertar_color(tab, fils, cols, tablero[fils][cols]);
+				}
+		}
+}
+
+/** Cambia de jugador */
+void juego_cambiar_jugador() {
+	switch (jugadorActual) {
+		case 1: jugadorActual = 2; break;
+		case 2: jugadorActual = 1; break;
+	}
+}
+
+/** Guarda una jugada */
+void juego_guardar_jugada(uint8_t fila, uint8_t columna) {
+		jugada_anterior[0] = fila;
+		jugada_anterior[1] = columna;
+}
+
+/** Cancela la jugada anterior */
+void juego_cancelar_jugada() {
+		if (sePuedeCancelar) {
+				juego_cambiar_jugador();
+				tablero_borrar_celda(&tablero_actual, jugada_anterior[0], jugada_anterior[1]);
+				jugada_anterior[0] = -1;
+				jugada_anterior[1] = -1;
+				juego_mostrar_tablero(tablero_actual);
+				juego_mostrar_turno_jugador();
+				juego_escribir_en_pantalla(JUGADA_CANCELADA);
+				sePuedeCancelar = FALSE;
+		}
+		else {
+				if (jugada_anterior[0] == -1) {
+						juego_escribir_en_pantalla(NO_PUEDE_CANCELAR_ANTERIOR);
+				}
+				else {
+						juego_escribir_en_pantalla(NO_PUEDE_CANCELAR_TIEMPO);
+				}
+		}
+}
+
+/***/
+char *eventoToString(enum EVENTO_T evento) {
+    switch (evento) {
+        case ID_VOID:
+						return "Total";
+        case ev_TRATAR_EVENTO:
+            return "ev_TRATAR_EVENTO";
+        case ev_BOTON_PULSADO:
+            return "ev_BOTON_PULSADO";
+        case ev_BOTON_MONITORIZAR:
+            return "ev_BOTON_MONITORIZAR";
+        case ev_ALARMA_OVERFLOW:
+            return "ev_ALARMA_OVERFLOW";
+        case ev_LATIDO:
+            return "ev_LATIDO";
+        case ev_VISUALIZAR_HELLO:
+            return "ev_VISUALIZAR_HELLO";
+        case ev_USUARIO_AUSENTE:
+            return "ev_USUARIO_AUSENTE";
+        case ev_RX_SERIE:
+            return "ev_RX_SERIE";
+        case ev_TX_SERIE:
+            return "ev_TX_SERIE";
+        case ev_END_GAME:
+            return "ev_END_GAME";
+        case ev_RST_CANCELACION:
+            return "ev_RST_CANCELACION";
+        default:
+            return "Desconocido";
+    }
+}
+
+/** Muestra las estadisticas del menu de finalizacion de una partida*/
+void juego_menu_final_partida(void){
+		int t_proc;
+		char tiempo[200];
+		juego_escribir_en_pantalla(MENU_FIN_PARTIDA);
+		juego_escribir_en_pantalla(causa);
+		t_proc = momento_fin_partida - momento_inicio_partida;
+		juego_escribir_en_pantalla(TIEMPO_PROCESADOR);
+		sprintf(tiempo, "%d", t_proc);
+		juego_escribir_en_pantalla(tiempo);
+		juego_escribir_en_pantalla(TIEMPO_TOTAL_HAY_LINEA);
+		sprintf(tiempo, "%d", (int)t_hay_linea_total);
+		juego_escribir_en_pantalla(tiempo);
+		juego_escribir_en_pantalla(TIEMPO_MEDIA_HAY_LINEA);
+		t_proc = t_hay_linea_total / t_hay_linea_media;
+		sprintf(tiempo, "%d", t_proc);
+		juego_escribir_en_pantalla(tiempo);
+		juego_escribir_en_pantalla(TIEMPO_TOTAL_PENSAR_JUGADA);
+		sprintf(tiempo, "%d", (int)t_pensar_jugada_total);
+		juego_escribir_en_pantalla(tiempo);
+		t_proc = t_pensar_jugada_total / t_pensar_jugada_media;
+		juego_escribir_en_pantalla(TIEMPO_MEDIA_PENSAR_JUGADA);
+		sprintf(tiempo, "%d", t_proc);
+		juego_escribir_en_pantalla(tiempo);
+		
+		juego_escribir_en_pantalla(EVENTOS);
+		for(enum EVENTO_T evento = ID_VOID; evento <= ev_RST_CANCELACION; evento++){
+				sprintf(tiempo, "\tEvento: %s - Repeticiones: %u\n", eventoToString(evento), FIFO_estadisticas(evento));
+				juego_escribir_en_pantalla(tiempo);
+		}
+}
+
+/** Finaliza el juego */
+void juego_finalizar() {
+		gpio_hal_escribir(gpio_comando_error, gpio_comando_error_bits, 0x0);
+		estado = FINISH;
+		momento_fin_partida = clock_getus();
+		juego_menu_final_partida();	
+		juego_mostrar_final();
+}
+
+/** Finaliza el juego */
+void juego_rendirse() {
+		juego_mostrar_rendido();
+		juego_cambiar_jugador();
+		juego_mostrar_ganador();
+		juego_finalizar();
+}
+
+/** Determina si el caracter es un numero valido */
+int juego_es_numero(uint32_t caracter) {
+		return (caracter <= 9);
+}
+
+/** Ejecuta una jugada sobre el tablero */
+void juego_aplicar_jugada(uint8_t fila, uint8_t columna) {
+		if(tablero_insertar_color(&tablero_actual, fila, columna, jugadorActual) == ERROR) {
+				while(1); //no cabe en la matriz dispersa, hemos dimensionado mal, error de diseño
+		}
+}
+
+/** Devuelve TRUE si se ha conseguido una linea */
+uint8_t juego_verificar_K_en_linea(uint8_t fila, uint8_t columna) {
+		int valor;
+		t_aux = clock_getus();
+		valor = conecta_K_verificar_K_en_linea(&tablero_actual, fila, columna, jugadorActual);
+		t_aux2 = clock_getus();
+		t_hay_linea_total = t_hay_linea_total + (t_aux2 - t_aux);
+		t_hay_linea_media = t_hay_linea_media + 1;
+		return valor;
+}
+
+/** Si se trata de una jugada válida, la coloca en el trablero y mira si se ha terminado el juego */
+void juego_procesar_jugada(uint32_t auxData) {
+		uint8_t fila = (((auxData >> 24) & 0xFF) - '0') - 1;
+		uint8_t guion = (auxData >> 16) & 0xFF;
+		uint8_t columna = (((auxData >> 8) & 0xFF) - '0') - 1;
+		
+		if ((juego_es_numero(fila) == FALSE) || (juego_es_numero(columna) == FALSE) || (guion != '-')) {
+				gpio_hal_escribir(gpio_comando_error, gpio_comando_error_bits, 0x1);
+				juego_escribir_en_pantalla(ERROR_COMANDO_NO_VALIDO);
+		}
+		else if (tablero_fila_valida(fila) == FALSE) {
+				gpio_hal_escribir(gpio_comando_error, gpio_comando_error_bits, 0x1);
+				juego_escribir_en_pantalla(ERROR_FILA);
+		}
+		else if (tablero_fila_valida(columna) == FALSE) {
+				gpio_hal_escribir(gpio_comando_error, gpio_comando_error_bits, 0x1);
+				juego_escribir_en_pantalla(ERROR_COLUMNA);
+		}
+		else if (celda_vacia(tablero_leer_celda(&tablero_actual, fila, columna)) == FALSE){
+				juego_escribir_en_pantalla(ERROR_CELDA_LLENA);
+		}
+		else {
+				gpio_hal_escribir(gpio_comando_error, gpio_comando_error_bits, 0x0);
+				alarma_activar(ev_RST_CANCELACION, 0x00000BB8, 0);
+				juego_guardar_jugada(fila, columna);
+				juego_aplicar_jugada(fila, columna);
+				if (juego_verificar_K_en_linea(fila, columna)) {
+						juego_mostrar_tablero(tablero_actual);
+						juego_mostrar_ganador();
+						strcpy(causa, CAUSA_VICTORIA);
+						juego_finalizar();
+				}
+				else {
+						sePuedeCancelar = TRUE;
+						juego_cambiar_jugador();
+						t_inicio_pensar_jugada = clock_getus();
+						juego_mostrar_tablero(tablero_actual);
+						juego_mostrar_turno_jugador();
+						juego_escribir_en_pantalla(PULSA_CANCELAR);
+				}
+		}
+}
+
+/* Prepara la partida para comenzar.
+ * Llamada con tablero test al inicio, y con
+ * tablero vacio en las partidas posteriores */
+void juego_preparar_partida(uint8_t tablero_a_cargar[7][7]) {
+		tablero_inicializar(&tablero_actual);
+		juego_cargar_tablero(&tablero_actual, tablero_a_cargar);
+		jugada_anterior[0] = -1;
+		jugada_anterior[1] = -1;
+		t_hay_linea_total = 0;
+		t_hay_linea_media = 0;
+		t_pensar_jugada_media = 0;
+		t_pensar_jugada_total = 0;
+		t_inicio_pensar_jugada = 0;
+		t_final_pensar_jugada = 0;
+		sePuedeCancelar = FALSE;
+		estado = START;
+		juego_escribir_en_pantalla(TABLERO_CARGADO);
+}
+
+/** Inicia el juego la primera vez con un tablero de test */
+void juego_init_test_conectaK() {
+		#include "tablero_test.h"
+		juego_borrar_pantalla();
+		juego_mostrar_instrucciones();
+		jugadorActual = 1;
+		juego_preparar_partida(tablero_test);
+}
+
+/** Inicia el juego la primera vez con un tablero vacio */
+void juego_init_vacio_conectaK() {
+		#include "tablero_test.h"
+		juego_borrar_pantalla();
+		jugadorActual = 2;
+		juego_preparar_partida(tablero_test_vacio);
+}
+
+/* Comienza la partida tras la primera acción para que pueda
+ * empezar a leer comandos y botones */
+void juego_comenzar_partida() {
+		juego_mostrar_tablero(tablero_actual);
+		juego_mostrar_turno_jugador();
+		momento_inicio_partida = clock_getus();
+		estado = PLAYING;
+}
+
+/** Trata un comando */
+void juego_tratar_comando(uint32_t auxData) {
+		switch (auxData) {
+				case NEW:
+						juego_init_vacio_conectaK();
+						break;
+				case END:
+						switch (estado) {
+								case START:
+										break;
+								case FINISH:
+										break;
+								default:
+										strcpy(causa, CAUSA_END);
+										juego_rendirse();
+										break;
+						}
+						break;
+				default:
+						switch (estado) {
+								case START:
+										break;
+								case FINISH:
+										break;
+								default:
+										juego_procesar_jugada(auxData);
+										break;
+						}
+						break;
+		}
+}
+
+void juego_tratar_boton(uint32_t auxData) {
+		switch (estado) {
+				case START: 
+						juego_comenzar_partida();
+						break;
+				case PLAYING: 
+						switch(auxData){
+								case EINT1:
+										juego_cancelar_jugada();
+										break;
+								case EINT2:
+										strcpy(causa, CAUSA_BOTON);
+										juego_rendirse();
+										break;
+						}
+						break;
+				case FINISH:
+						juego_init_vacio_conectaK();
+		}
+}
+
+void juego_tratar_evento(enum EVENTO_T ID_evento, uint32_t auxData){
+		uint32_t tiempo_pensar_jugada;
+		switch(ID_evento){
+				case ev_BOTON_PULSADO:
+						juego_tratar_boton(auxData);
+						break;
+				case ev_RST_CANCELACION:
+						sePuedeCancelar = FALSE;
+						break;
+				case ev_RX_SERIE:
+						t_final_pensar_jugada = clock_getus();
+						tiempo_pensar_jugada = t_final_pensar_jugada - t_inicio_pensar_jugada;
+						t_pensar_jugada_total = t_pensar_jugada_total + tiempo_pensar_jugada;
+						t_pensar_jugada_media++;
+						juego_tratar_comando(auxData);
+						break;
+				default:
+						while(1); //error
+		}
+}
+
+// Inicializa el juego, primera funcion a la que llamar
+void juego_inicializar(void(*funcion_callback)(), unsigned int comando_error, unsigned int comando_error_bits){
+		funcion_encolar = funcion_callback;
+		gpio_comando_error = comando_error;
+		gpio_comando_error_bits = comando_error_bits;
+		juego_init_test_conectaK();
+}
